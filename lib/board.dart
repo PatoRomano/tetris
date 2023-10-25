@@ -14,7 +14,7 @@ List<List<Tetromino?>> gameBoard = List.generate(
         (i) => List.generate(
           rowLenght,
             (j) => null,
-        )
+        ),
 );
 
 
@@ -29,6 +29,10 @@ class _GameBoardState extends State<GameBoard> {
 
   Piece currentPiece = Piece(type: Tetromino.L);
 
+  int currentScore = 0;
+
+  bool gameOver = false;
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +43,7 @@ class _GameBoardState extends State<GameBoard> {
   void startGame() {
     currentPiece.initializePiece();
 
-    Duration frameRate = const Duration(milliseconds: 800);
+    Duration frameRate = const Duration(milliseconds: 400);
     gameLoop(frameRate);
   }
 
@@ -48,12 +52,48 @@ class _GameBoardState extends State<GameBoard> {
       frameRate,
       (timer) {
         setState(() {
-
+          clearLines();
           checkLanding();
+          if(gameOver){
+            timer.cancel();
+            showGameOverDialog();
+          }
           currentPiece.movePiece(Direction.down);
         });
       }
     );
+  }
+
+  void showGameOverDialog() {
+    showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text('Game Over'),
+      content: Text('Tu puntaje alcanzado es:  $currentScore'),
+      actions: [
+        TextButton(onPressed: () {
+          // restart
+          resetGame();
+          Navigator.pop(context);
+        }, child: Text('Jugar de nuevo'))
+      ],
+    ),);
+  }
+
+  void resetGame() {
+    //limpiar el tablero
+    gameBoard = List.generate(
+      colLenght,
+          (i) => List.generate(
+        rowLenght,
+            (j) => null,
+      ),
+    );
+
+    gameOver = false;
+    currentScore = 0;
+
+    createNewPiece();
+
+    startGame();
   }
 
   bool checkCollision(Direction direction) {
@@ -73,6 +113,9 @@ class _GameBoardState extends State<GameBoard> {
 
       if (row >= colLenght || col < 0 || col >= rowLenght) {
         return true;
+      }
+      if (row < colLenght && row >= 0 && gameBoard[row][col] != null) {
+        return true; // collision with a landed piece
       }
     }
     return false;
@@ -95,39 +138,143 @@ class _GameBoardState extends State<GameBoard> {
   void createNewPiece() {
     Random rand = Random();
 
-    Tetromino randomType = Tetromino.values[rand.nextInt(Tetromino.values.length)];
+    Tetromino randomType =
+        Tetromino.values[rand.nextInt(Tetromino.values.length)];
     currentPiece = Piece(type: randomType);
     currentPiece.initializePiece();
+
+    // en lugar de chequear cada frame, se chequea al crear una nueva pieza, para ver si la fila de arriba esta ocupada.
+    if(isGameOver()) {
+      gameOver = true;
+    }
+  }
+
+  void moveLeft () {
+    // asegurarse que el movimiento es valido antes de moverlo
+    if (!checkCollision(Direction.left)){
+      setState(() {
+        currentPiece.movePiece(Direction.left);
+      });
+    }
+  }
+
+  void moveRight () {
+    // asegurarse que el movimiento es valido antes de moverlo
+    if (!checkCollision(Direction.right)){
+      setState(() {
+        currentPiece.movePiece(Direction.right);
+      });
+    }
+  }
+
+  void rotatePiece () {
+    setState(() {
+      currentPiece.rotatePiece();
+    });
+  }
+
+  // eliminar una linea completa
+  void clearLines() {
+    // recorrer cada fila de abajo arriba.
+
+    for(int row = colLenght - 1; row >= 0; row--) {
+      // inicializar una variable para rastrear si la fila esta completa.
+      bool rowIsFull = true;
+
+      // verifica si la fila esta completa
+      for(int col = 0; col < rowLenght; col++) {
+        // si hay una sola columna vacia, retorna falso
+        if(gameBoard[row][col] == null) {
+          rowIsFull = false;
+          break;
+        }
+      }
+
+      // si esta llena, eliminar la fila y bajar las piezas una fila
+      if(rowIsFull) {
+        // mover todas las filas hhacia abajo
+        for(int r = row; r > 0; r--) {
+          // copia la fila superior, a la fila actual, es decir, digamos, osea, copia tal cual esta a la de abajo.
+          gameBoard[r] = List.from(gameBoard[r-1]);
+        }
+
+        // setear la fila superior a vacia.
+        gameBoard[0] = List.generate(row, (index) => null);
+
+        // incrementar el puntaje.
+        currentScore += 100;
+
+      }
+    }
+  }
+
+  // GAME OVER
+  bool isGameOver() {
+    for(int col = 0; col < rowLenght; col++) {
+      if(gameBoard[0][col] != null) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: GridView.builder(
-          itemCount: rowLenght * colLenght,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: rowLenght),
-          itemBuilder: (context, index) {
-            int row = (index / rowLenght).floor();
-            int col = index % rowLenght;
-            if (currentPiece.position.contains(index)){
-              return Pixel(
-                color: Colors.yellow,
-                child: index,
-              );
+      body: Column(
+        children: [
 
-            } else if (gameBoard[row][col] != null){
-              return Pixel(color: Colors.pink, child: '');
+          //GRILLA DEL JUEGO
+          Expanded(
+            child: GridView.builder(
+                itemCount: rowLenght * colLenght,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: rowLenght),
+                itemBuilder: (context, index) {
+                  int row = (index / rowLenght).floor();
+                  int col = index % rowLenght;
+                  if (currentPiece.position.contains(index)){
+                    return Pixel(
+                      color: currentPiece.color,
+                    );
 
-            } else {
-              return Pixel(
-                color: Colors.grey[900],
-                child: index,
-              );
-            }
-          }
+                  } else if (gameBoard[row][col] != null){
+                    final Tetromino? tetrominoType = gameBoard[row][col];
+                    return Pixel(
+                        color: tetrominoColors[tetrominoType],
+                    );
+
+                  } else {
+                    return Pixel(
+                      color: Colors.grey[900],
+                    );
+                  }
+                }
+            ),
+          ),
+
+          Text(
+              'Puntaje:  $currentScore',
+            style: TextStyle(color: Colors.white),
+          ),
+
+          // CONTROLADORES DEL JUEGO
+          Padding(
+            padding: const EdgeInsets.only(bottom: 50.0, top: 50),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+              // izquierda
+              IconButton(onPressed: moveLeft, color: Colors.white, icon: Icon(Icons.arrow_back_ios_new)),
+              // rotar
+              IconButton(onPressed: rotatePiece, color: Colors.white, icon: Icon(Icons.rotate_right)),
+              //derecha
+              IconButton(onPressed: moveRight, color: Colors.white, icon: Icon(Icons.arrow_forward_ios)),
+            ],),
+          )
+        ],
       ),
     );
   }
