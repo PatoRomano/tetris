@@ -33,6 +33,10 @@ class _GameBoardState extends State<GameBoard> {
 
   bool gameOver = false;
 
+  Duration frameRate = Duration(milliseconds: 500);
+
+  String difficulty = 'Fácil';
+
   @override
   void initState() {
     super.initState();
@@ -43,15 +47,15 @@ class _GameBoardState extends State<GameBoard> {
   void startGame() {
     currentPiece.initializePiece();
 
-    Duration frameRate = const Duration(milliseconds: 400);
-    gameLoop(frameRate);
+    gameLoop();
   }
 
-  void gameLoop(Duration frameRate) {
+  void gameLoop() {
     Timer.periodic(
       frameRate,
       (timer) {
         setState(() {
+          increaseDifficulty();
           clearLines();
           checkLanding();
           if(gameOver){
@@ -64,6 +68,25 @@ class _GameBoardState extends State<GameBoard> {
     );
   }
 
+  void increaseDifficulty() {
+    if(currentScore == 100) {
+      frameRate = Duration(milliseconds: 400);
+    } else if (currentScore > 1000) {
+      frameRate = Duration(milliseconds: 300);
+    }
+    checkDifficulty();
+  }
+
+  void checkDifficulty() {
+    if(frameRate >= Duration(milliseconds: 500)) {
+      difficulty = 'Fácil';
+    } else if (frameRate == Duration(milliseconds: 400)) {
+      difficulty = 'Media';
+    } else if (frameRate < Duration(milliseconds: 300)) {
+      difficulty = 'Difícil';
+    }
+  }
+
   void showGameOverDialog() {
     showDialog(context: context, builder: (context) => AlertDialog(
       title: Text('Game Over'),
@@ -73,7 +96,8 @@ class _GameBoardState extends State<GameBoard> {
           // restart
           resetGame();
           Navigator.pop(context);
-        }, child: Text('Jugar de nuevo'))
+        }, child: Text('Jugar de nuevo')
+        ),
       ],
     ),);
   }
@@ -224,6 +248,15 @@ class _GameBoardState extends State<GameBoard> {
       backgroundColor: Colors.black,
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 10.0),
+            child: TextButton(onPressed: () {
+              // restart
+              gameOver = true;
+            }, child: Text('Reiniciar')
+            ),
+          ),
+
 
           //GRILLA DEL JUEGO
           Expanded(
@@ -255,14 +288,23 @@ class _GameBoardState extends State<GameBoard> {
             ),
           ),
 
-          Text(
-              'Puntaje:  $currentScore',
-            style: TextStyle(color: Colors.white),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                  'Puntaje:  $currentScore',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                'Dificultad:  $difficulty',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
           ),
 
           // CONTROLADORES DEL JUEGO
           Padding(
-            padding: const EdgeInsets.only(bottom: 50.0, top: 50),
+            padding: const EdgeInsets.only(bottom: 25.0, top: 25),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
