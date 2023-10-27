@@ -15,6 +15,7 @@ class Piece {
     return tetrominoColors[type] ?? const Color(0xFFFFFFFF);
   }
 
+  //crea una nueva pieza
   void initializePiece() {
     switch(type){
       case Tetromino.L:
@@ -56,6 +57,7 @@ class Piece {
     }
   }
 
+  // mover una pieza.
   void movePiece(Direction direction) {
     switch (direction) {
       case Direction.down:
@@ -76,6 +78,17 @@ class Piece {
       default:
     }
   }
+
+  // a partir de aca empieza la logica de rotar las piezas
+  // cada pieza se rota de manera diferente ya que tienen distintas formas.
+  // todas las piezas poseen un pivot, es decir giran sobre un eje,
+  // ese pivot va a ser el pixel que no se mueva, va a permanecer igual.
+  // los demas van a cambiar su posicion respecto a el.
+  // luego hay que tener en cuenta que cada pieza tiene un estado de rotacion,
+  // y en total son 4, puede estar en su posicion inicial, o rotada 3 veces.
+  // todas las piezas rotan en sentido horario.
+  // la unica pieza que no rota es el cuadrado "O"
+  //
   int rotationState = 1;
   void rotatePiece () {
     List<int> newPosition = [];
@@ -409,6 +422,8 @@ class Piece {
     }
   }
 
+  // verifica si la posicion dada por parametro es valida o no
+  // o si esta ocupada por otra pieza que ya cayó.
   bool positionIsValid(int position) {
     int row = (position/rowLenght).floor();
     int col = position % rowLenght;
@@ -420,6 +435,8 @@ class Piece {
     }
   }
 
+  // verifica si la posicion que va a ocupar cada pixel de la pieza
+  // que estoy moviendo es valida o no.
   bool piecePositionIsValid(List<int> piecePosition) {
     bool firstColOcuppied = false;
     bool lastColOccupied = false;
@@ -443,7 +460,7 @@ class Piece {
   }
 }
 
-
+// color asignado a cada pieza
 const Map<Tetromino, Color> tetrominoColors = {
   Tetromino.L: Color.fromARGB(255, 255, 120, 39),
   Tetromino.J: Color.fromARGB(255, 57, 81, 255),

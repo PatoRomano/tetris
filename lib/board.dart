@@ -249,7 +249,7 @@ class _GameBoardState extends State<GameBoard> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 10.0),
+            padding: const EdgeInsets.only(top: 20, bottom: 10.0),
             child: TextButton(onPressed: () {
               // restart
               gameOver = true;
