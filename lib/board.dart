@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/scroll_view.dart';
 import 'package:flutter/src/rendering/sliver_grid.dart';
@@ -37,11 +39,20 @@ class _GameBoardState extends State<GameBoard> {
 
   String difficulty = 'Fácil';
 
+  AudioPlayer _audioPlayer = AudioPlayer(); 
   @override
   void initState() {
     super.initState();
-
+    startBackgroundMusic();
     startGame();
+  }
+
+   void startBackgroundMusic() async {
+    // Reemplaza 'tu_cancion.mp3' con la ruta de tu archivo de música
+    final file = File('assets/machiavellian-nightmare-electronic-dystopia-ai-robot-machine-139385.mp3');
+    await _audioPlayer.play(UrlSource(file.path));
+    _audioPlayer.setVolume(1);
+
   }
 
   void startGame() {
