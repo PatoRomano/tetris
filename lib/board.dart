@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/scroll_view.dart';
 import 'package:flutter/src/rendering/sliver_grid.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:soundpool/soundpool.dart';
 import 'package:tetris/piece.dart';
 import 'package:tetris/pixel.dart';
 import 'package:tetris/values.dart';
@@ -38,25 +41,36 @@ class _GameBoardState extends State<GameBoard> {
   Duration frameRate = Duration(milliseconds: 500);
 
   String difficulty = 'Fácil';
-
-  AudioPlayer _audioPlayer = AudioPlayer(); 
+ late AudioPlayer _audioPlayer = AudioPlayer();
+ late AudioPlayer _gameOver = AudioPlayer();
+ late AudioPlayer _pick = AudioPlayer();
+ 
   @override
   void initState() {
     super.initState();
-    startBackgroundMusic();
+    _audioPlayer..setAsset('assets/sounds/musica.mp3');
+    _gameOver..setAsset('assets/sounds/sad-trumpet.mp3');
+    _pick..setAsset('assets/sounds/pick.mp3');
     startGame();
   }
 
-   void startBackgroundMusic() async {
-    // Reemplaza 'tu_cancion.mp3' con la ruta de tu archivo de música
-    final file = File('assets/machiavellian-nightmare-electronic-dystopia-ai-robot-machine-139385.mp3');
-    await _audioPlayer.play(UrlSource(file.path));
-    _audioPlayer.setVolume(1);
+
+
+  Future<void> _soundmovepiece() async {
+    Soundpool pool = Soundpool(streamType: StreamType.notification);
+
+    int soundId = await rootBundle
+    .load("assets/sounds/Tetris-block-move-sound-effect.mp3")
+    .then((ByteData soundData) {
+                  return pool.load(soundData);
+                });
+    int streamId = await pool.play(soundId);
 
   }
 
   void startGame() {
     currentPiece.initializePiece();
+    _audioPlayer.play();
 
     gameLoop();
   }
@@ -70,6 +84,9 @@ class _GameBoardState extends State<GameBoard> {
           clearLines();
           checkLanding();
           if(gameOver){
+            _gameOver.play();
+            _audioPlayer.seek(Duration.zero, index: 2);
+            _audioPlayer.stop();
             timer.cancel();
             showGameOverDialog();
           }
@@ -92,8 +109,10 @@ class _GameBoardState extends State<GameBoard> {
     if(frameRate >= Duration(milliseconds: 500)) {
       difficulty = 'Fácil';
     } else if (frameRate == Duration(milliseconds: 400)) {
+      _audioPlayer.setSpeed(1.2);
       difficulty = 'Media';
     } else if (frameRate < Duration(milliseconds: 300)) {
+       _audioPlayer.setSpeed(1.5);
       difficulty = 'Difícil';
     }
   }
@@ -185,6 +204,7 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void moveLeft () {
+    _soundmovepiece();
     // asegurarse que el movimiento es valido antes de moverlo
     if (!checkCollision(Direction.left)){
       setState(() {
@@ -194,6 +214,7 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void moveRight () {
+    _soundmovepiece();
     // asegurarse que el movimiento es valido antes de moverlo
     if (!checkCollision(Direction.right)){
       setState(() {
@@ -203,6 +224,7 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void rotatePiece () {
+    _soundmovepiece();
     setState(() {
       currentPiece.rotatePiece();
     });
@@ -238,7 +260,7 @@ class _GameBoardState extends State<GameBoard> {
 
         // incrementar el puntaje.
         currentScore += 100;
-
+        _pick.play();
       }
     }
   }

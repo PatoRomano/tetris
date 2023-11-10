@@ -1,3 +1,4 @@
+
 name: tetris
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
@@ -36,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   audioplayers: 5.2.0
   soundpool: ^2.4.1
+  just_audio: ^0.9.35
+  just_audio_background: ^0.0.1-beta.10
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -61,7 +64,12 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/sounds/
     - assets/images/espacio.jpg
+    - assets/sounds/Tetris-block-move-sound-effect.mp3
+    - assets/sounds/musica.mp3
+    - assets/sounds/pick.mp3
+    - assets/sounds/sad-trumpet.mp3
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
