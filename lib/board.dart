@@ -38,19 +38,19 @@ class _GameBoardState extends State<GameBoard> {
 
   bool gameOver = false;
 
-  Duration frameRate = Duration(milliseconds: 500);
+  Duration frameRate = const Duration(milliseconds: 500);
 
   String difficulty = 'Fácil';
- late AudioPlayer _audioPlayer = AudioPlayer();
- late AudioPlayer _gameOver = AudioPlayer();
- late AudioPlayer _pick = AudioPlayer();
+ late final AudioPlayer _audioPlayer = AudioPlayer();
+ late final AudioPlayer _gameOver = AudioPlayer();
+ late final AudioPlayer _pick = AudioPlayer();
  
   @override
   void initState() {
     super.initState();
-    _audioPlayer..setAsset('assets/sounds/musica.mp3');
-    _gameOver..setAsset('assets/sounds/sad-trumpet.mp3');
-    _pick..setAsset('assets/sounds/pick.mp3');
+    _audioPlayer.setAsset('assets/sounds/musica.mp3');
+    _gameOver.setAsset('assets/sounds/sad-trumpet.mp3');
+    _pick.setAsset('assets/sounds/pick.mp3');
     startGame();
   }
 

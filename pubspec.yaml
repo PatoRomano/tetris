@@ -39,6 +39,7 @@ dependencies:
   soundpool: ^2.4.1
   just_audio: ^0.9.35
   just_audio_background: ^0.0.1-beta.10
+  flutter_launcher_icons: ^0.13.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -52,9 +53,12 @@ dev_dependencies:
   
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
+flutter_launcher_icons:
+    android: "launcher_icon"
+    image_path: "assets/icons/tetris.png"
 # The following section is specific to Flutter packages.
 flutter:
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
