@@ -60,6 +60,9 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void startGame() {
+    currentScore = 0;
+    volver = false;
+
     currentPiece.initializePiece();
     _audioPlayer.play();
 
@@ -78,7 +81,6 @@ class _GameBoardState extends State<GameBoard> {
           _audioPlayer.stop();
           timer.cancel();
           showGameOverDialog();
-          currentScore = 0;
         }
         currentPiece.movePiece(Direction.down);
       });
@@ -128,11 +130,21 @@ class _GameBoardState extends State<GameBoard> {
       );
     } else {
       showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                title:const Text('Game Over'),
-                content: Text('Tu puntaje alcanzado es:  $currentScore'),
-              ));
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Game Over'),
+          content: Text('Tu puntaje alcanzado es:  $currentScore'),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  // restart
+                  Navigator.pop(context);
+                },
+                child:const Text('Ok')),
+          ],
+        ),
+      );
+      resetGame();
     }
   }
 
@@ -147,11 +159,22 @@ class _GameBoardState extends State<GameBoard> {
     );
 
     gameOver = false;
-    currentScore = 0;
+    if(!volver) {
+      createNewPiece();
 
-    createNewPiece();
+      startGame();
+    }
+  }
 
-    startGame();
+  void endGame() {
+    //limpiar el tablero
+    gameBoard = List.generate(
+      colLenght,
+          (i) => List.generate(
+        rowLenght,
+            (j) => null,
+      ),
+    );
   }
 
   bool checkCollision(Direction direction) {
@@ -296,42 +319,38 @@ class _GameBoardState extends State<GameBoard> {
                 child: const Text(
                   'Reiniciar',
                   style: TextStyle(
-                    fontFamily:
-                        'roundedsqure', // Reemplaza 'TuFuentePixelArt' con la fuente pixel art que desees
-                    fontSize:
-                        16, // Ajusta el tamaño de la fuente según tus necesidades
-                    color: Colors
-                        .white, // Ajusta el color del texto según tus necesidades
+                    fontFamily: 'roundedsqure',
+                    fontSize: 16,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
-            InkWell(
-              onTap: () {
-                volver = true;
-                gameOver = true;
-                // Navegar a la pantalla del juego
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MenuScreen()),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                      color: Colors.transparent), // Hacer el botón transparente
-                ),
-                padding: const EdgeInsets.all(
-                    10), // Ajusta el espaciado según tus necesidades
-                child: const Text(
-                  'Volver',
-                  style: TextStyle(
-                    fontFamily:
-                        'roundedsqure', // Reemplaza 'TuFuentePixelArt' con la fuente pixel art que desees
-                    fontSize:
-                        16, // Ajusta el tamaño de la fuente según tus necesidades
-                    color: Colors
-                        .white, // Ajusta el color del texto según tus necesidades
+            Padding(
+              padding: const EdgeInsets.only(top: 20, bottom: 10.0),
+              child: InkWell(
+                onTap: () {
+                  volver = true;
+                  gameOver = true;
+                  // Navegar a la pantalla del juego
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MenuScreen()),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Colors.transparent),
+                  ),
+                  padding: const EdgeInsets.all(
+                      10),
+                  child: const Text(
+                    'Volver',
+                    style: TextStyle(
+                      fontFamily: 'roundedsqure',
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -370,11 +389,17 @@ class _GameBoardState extends State<GameBoard> {
             children: [
               Text(
                 'Puntaje:  $currentScore',
-                style:const TextStyle(color: Colors.white),
+                style:const TextStyle(
+                    fontFamily: 'roundedsqure',
+                    color: Colors.white,
+                ),
               ),
               Text(
                 'Dificultad:  $difficulty',
-                style:const TextStyle(color: Colors.white),
+                style:const TextStyle(
+                    fontFamily: 'roundedsqure',
+                    color: Colors.white,
+                ),
               ),
             ],
           ),
