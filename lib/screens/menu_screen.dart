@@ -6,7 +6,18 @@ class MenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tetris'),
+        
+        title: const Text('Tetris',
+         style: TextStyle(
+            fontFamily: 'roundedsqure', // Reemplaza 'TuFuentePixelArt' con la fuente pixel art que desees
+            fontSize: 40, // Ajusta el tamaño de la fuente según tus necesidades
+            color: Colors.white, // Ajusta el color del texto según tus necesidades
+          ),
+         
+          ),
+         centerTitle: true,
+         toolbarHeight: 100,
+        backgroundColor: Colors.black,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -18,7 +29,7 @@ class MenuScreen extends StatelessWidget {
               image:  AssetImage(
                 'assets/images/espacio.jpg',
               )),
-          const SizedBox(height: 20),
+          const SizedBox(height: 40),
           InkWell(
       onTap: () {
         // Navegar a la pantalla del juego
@@ -36,7 +47,7 @@ class MenuScreen extends StatelessWidget {
           'Iniciar Juego',
           style: TextStyle(
             fontFamily: 'roundedsqure', // Reemplaza 'TuFuentePixelArt' con la fuente pixel art que desees
-            fontSize: 16, // Ajusta el tamaño de la fuente según tus necesidades
+            fontSize: 25, // Ajusta el tamaño de la fuente según tus necesidades
             color: Colors.white, // Ajusta el color del texto según tus necesidades
           ),
         ),
