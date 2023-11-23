@@ -149,6 +149,7 @@ class _GameBoardState extends State<GameBoard> {
     if (gameOver && !volver && !pause) {
       // ignore: use_build_context_synchronously
       showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.grey[900],
@@ -181,6 +182,7 @@ class _GameBoardState extends State<GameBoard> {
     } else if (volver) {
       // ignore: use_build_context_synchronously
       showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.grey[900],
@@ -211,6 +213,7 @@ class _GameBoardState extends State<GameBoard> {
     } else if (pause) {
       // ignore: use_build_context_synchronously
       showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.grey[900],
