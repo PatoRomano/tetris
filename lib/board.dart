@@ -38,7 +38,7 @@ class _GameBoardState extends State<GameBoard> {
   late final AudioPlayer _audioPlayer = AudioPlayer();
   late final AudioPlayer _gameOver = AudioPlayer();
   late final AudioPlayer _pick = AudioPlayer();
-
+  late Timer gameTimer;
   @override
   void initState() {
     super.initState();
@@ -71,7 +71,7 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void gameLoop() {
-    Timer.periodic(frameRate, (timer) {
+    gameTimer = Timer.periodic(frameRate, (timer) {
       setState(() {
         increaseDifficulty();
         clearLines();
@@ -92,15 +92,17 @@ class _GameBoardState extends State<GameBoard> {
     if (currentScore <= 100) {
       frameRate = const Duration(milliseconds: 500);
       difficulty = 'Fácil';
-    } else if (currentScore == 300) {
+    } else if (currentScore > 200 && currentScore <= 300) {
       frameRate = const Duration(milliseconds: 300);
       _audioPlayer.setSpeed(1.2);
       difficulty = 'Media';
-    } else if (currentScore > 300){
+    } else if (currentScore > 300) {
       frameRate = const Duration(milliseconds: 100);
       _audioPlayer.setSpeed(1.3);
       difficulty = 'Difícil';
     }
+    gameTimer.cancel(); // Cancelar el temporizador existente si hay alguno
+    gameLoop();
   }
 
   void showGameOverDialog() {
