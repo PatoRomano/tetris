@@ -34,6 +34,7 @@ class _GameBoardState extends State<GameBoard> {
   bool gameOver = false;
   bool volver = false;
   bool pause = false;
+  String nombre = "Player";
 
   late final Soundpool _soundpool;
 
@@ -59,7 +60,6 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   Future<void> _soundmovepiece() async {
-
     int soundId = await rootBundle
         .load("assets/sounds/minecraft_click.mp3")
         .then((ByteData soundData) {
@@ -69,7 +69,6 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   Future<void> _soundClearLines() async {
-
     int soundId = await rootBundle
         .load("assets/sounds/pop.mp3")
         .then((ByteData soundData) {
@@ -78,12 +77,9 @@ class _GameBoardState extends State<GameBoard> {
     int streamId = await _soundpool.play(soundId);
   }
 
-
-
-
   Future<void> updateScores() async {
     final scores = await scoreManager.readScores();
-    scores.add(Score(playerName: 'Player', score: currentScore));
+    scores.add(Score(playerName: nombre, score: currentScore));
     await scoreManager.writeScores(scores);
   }
 
@@ -92,6 +88,7 @@ class _GameBoardState extends State<GameBoard> {
     _audioPlayer.setVolume(0.1);
     _gameOver.setVolume(0.1);
     frameRate = const Duration(milliseconds: 500);
+    nombre = "";
     currentScore = 0;
     volver = false;
     gameOver = false;
@@ -140,10 +137,13 @@ class _GameBoardState extends State<GameBoard> {
     //gameLoop();
   }
 
-
   void showGameOverDialog() async {
-    await updateScores();
+    nombre = "Player";
     gameTimer.cancel();
+    if (currentScore != 0) {
+      await _preguntarNombre();
+      await updateScores();
+    }
     if (gameOver && !volver && !pause) {
       // ignore: use_build_context_synchronously
       showDialog(
@@ -237,6 +237,51 @@ class _GameBoardState extends State<GameBoard> {
         ),
       );
     }
+  }
+
+  Future<void> _preguntarNombre() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text(
+            'Ingresa tu nombre',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+              fontFamily: 'roundedsqure',
+            ),
+          ),
+          content: TextField(
+            onChanged: (value) {
+              nombre = value;
+            },
+            decoration: InputDecoration(hintText: 'Nombre'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Cierra el cuadro de diálogo
+              },
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Cierra el cuadro de diálogo
+              },
+              child: const Text(
+                'Aceptar',
+                style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void resetGame() {
