@@ -284,6 +284,15 @@ class _GameBoardState extends State<GameBoard> {
     });
   }
 
+  void dropPiece() {
+    _soundmovepiece();
+    setState(() {
+      while(!checkCollision(Direction.down)) {
+        currentPiece.movePiece(Direction.down);
+      }
+    });
+  }
+
   // eliminar una linea completa
   void clearLines() {
     // recorrer cada fila de abajo arriba.
@@ -445,6 +454,10 @@ class _GameBoardState extends State<GameBoard> {
                     color: Colors.white,
                 ),
               ),
+              IconButton(
+                  onPressed: dropPiece,
+                  color: Colors.white,
+                  icon:const Icon(Icons.arrow_downward)),
             ],
           ),
 
