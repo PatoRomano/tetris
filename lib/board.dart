@@ -58,7 +58,7 @@ class _GameBoardState extends State<GameBoard> {
     Soundpool pool = Soundpool(streamType: StreamType.music);
 
     int soundId = await rootBundle
-        .load("assets/sounds/sonido.mp3")
+        .load("assets/sounds/minecraft_click.mp3")
         .then((ByteData soundData) {
       return pool.load(soundData);
     });
