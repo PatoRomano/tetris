@@ -52,7 +52,7 @@ class _GameBoardState extends State<GameBoard> {
     Soundpool pool = Soundpool(streamType: StreamType.music);
 
     int soundId = await rootBundle
-        .load("assets/sounds/Tetris-block-move-sound-effect.mp3")
+        .load("assets/sounds/sonido.mp3")
         .then((ByteData soundData) {
       return pool.load(soundData);
     });
