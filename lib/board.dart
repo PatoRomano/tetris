@@ -60,6 +60,7 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void startGame() {
+    frameRate = const Duration(milliseconds: 500);
     currentScore = 0;
     volver = false;
 
@@ -91,7 +92,7 @@ class _GameBoardState extends State<GameBoard> {
     if (currentScore <= 100) {
       frameRate = const Duration(milliseconds: 500);
       difficulty = 'Fácil';
-    } else if (currentScore > 200 && currentScore <= 300) {
+    } else if (currentScore == 300) {
       frameRate = const Duration(milliseconds: 300);
       _audioPlayer.setSpeed(1.2);
       difficulty = 'Media';
@@ -275,7 +276,7 @@ class _GameBoardState extends State<GameBoard> {
         }
 
         // setear la fila superior a vacia.
-        gameBoard[0] = List.generate(row, (index) => null);
+        gameBoard[0] = List.generate(rowLenght, (index) => null);
 
         // incrementar el puntaje.
         currentScore += 100;
