@@ -35,6 +35,8 @@ class _GameBoardState extends State<GameBoard> {
   bool volver = false;
   bool pause = false;
 
+  late final Soundpool _soundpool;
+
   Duration frameRate = const Duration(milliseconds: 500);
 
   String difficulty = 'Fácil';
@@ -51,41 +53,44 @@ class _GameBoardState extends State<GameBoard> {
     _gameOver.setAsset('assets/sounds/sad-violin.mp3');
     _pop.setAsset('assets/sounds/pop.mp3');
     _pick.setAsset('assets/sounds/pick.mp3');
+    _soundpool = Soundpool(streamType: StreamType.music);
+
     startGame();
   }
 
   Future<void> _soundmovepiece() async {
-    Soundpool pool = Soundpool(streamType: StreamType.music);
 
     int soundId = await rootBundle
         .load("assets/sounds/minecraft_click.mp3")
         .then((ByteData soundData) {
-      return pool.load(soundData);
+      return _soundpool.load(soundData);
     });
-    int streamId = await pool.play(soundId);
+    int streamId = await _soundpool.play(soundId);
   }
 
   Future<void> _soundClearLines() async {
-    Soundpool pool = Soundpool(streamType: StreamType.music);
 
     int soundId = await rootBundle
         .load("assets/sounds/pop.mp3")
         .then((ByteData soundData) {
-      return pool.load(soundData);
+      return _soundpool.load(soundData);
     });
-    int streamId = await pool.play(soundId);
+    int streamId = await _soundpool.play(soundId);
   }
+
+
+
 
   Future<void> updateScores() async {
     final scores = await scoreManager.readScores();
-    // Realiza las actualizaciones necesarias en tu lista de puntuaciones
     scores.add(Score(playerName: 'Player', score: currentScore));
-    // Guarda la lista actualizada
     await scoreManager.writeScores(scores);
   }
 
   void startGame() {
     _audioPlayer.setSpeed(1);
+    _audioPlayer.setVolume(0.1);
+    _gameOver.setVolume(0.1);
     frameRate = const Duration(milliseconds: 500);
     currentScore = 0;
     volver = false;
@@ -134,6 +139,7 @@ class _GameBoardState extends State<GameBoard> {
     //gameTimer.cancel();
     //gameLoop();
   }
+
 
   void showGameOverDialog() async {
     await updateScores();
