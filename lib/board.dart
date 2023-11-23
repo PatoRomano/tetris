@@ -68,29 +68,31 @@ class _GameBoardState extends State<GameBoard> {
     pause = false;
 
     currentPiece.initializePiece();
+    _audioPlayer.setSpeed(1.0);
     _audioPlayer.play();
+    frameRate = const Duration(milliseconds: 500);
 
     gameLoop();
   }
 
   void gameLoop() {
-      gameTimer = Timer.periodic(frameRate, (timer) {
-        setState(() {
-          increaseDifficulty();
-          clearLines();
-          checkLanding();
-          if (gameOver || pause) {
-            if(gameOver && !pause) {
-              _gameOver.play();
-              _audioPlayer.seek(Duration.zero, index: 2);
-            }
-            _audioPlayer.stop();
-            showGameOverDialog();
-          } else {
-            currentPiece.movePiece(Direction.down);
+    gameTimer = Timer.periodic(frameRate, (timer) {
+      setState(() {
+        increaseDifficulty();
+        clearLines();
+        checkLanding();
+        if (gameOver || pause) {
+          if (gameOver && !pause) {
+            _gameOver.play();
+            _audioPlayer.seek(Duration.zero, index: 2);
           }
-        });
+          _audioPlayer.stop();
+          showGameOverDialog();
+        } else {
+          currentPiece.movePiece(Direction.down);
+        }
       });
+    });
   }
 
   void increaseDifficulty() {
@@ -125,7 +127,7 @@ class _GameBoardState extends State<GameBoard> {
                   resetGame();
                   Navigator.pop(context);
                 },
-                child:const Text('Jugar de nuevo')),
+                child: const Text('Jugar de nuevo')),
           ],
         ),
       );
@@ -141,7 +143,7 @@ class _GameBoardState extends State<GameBoard> {
                   // restart
                   Navigator.pop(context);
                 },
-                child:const Text('Ok')),
+                child: const Text('Ok')),
           ],
         ),
       );
@@ -159,7 +161,7 @@ class _GameBoardState extends State<GameBoard> {
                   continueGame();
                   Navigator.pop(context);
                 },
-                child:const Text('Reanudar')),
+                child: const Text('Reanudar')),
           ],
         ),
       );
@@ -177,7 +179,7 @@ class _GameBoardState extends State<GameBoard> {
     );
 
     gameOver = false;
-    if(!volver) {
+    if (!volver) {
       createNewPiece();
 
       startGame();
@@ -194,9 +196,9 @@ class _GameBoardState extends State<GameBoard> {
     //limpiar el tablero
     gameBoard = List.generate(
       colLenght,
-          (i) => List.generate(
+      (i) => List.generate(
         rowLenght,
-            (j) => null,
+        (j) => null,
       ),
     );
     gameOver = false;
@@ -287,7 +289,7 @@ class _GameBoardState extends State<GameBoard> {
   void dropPiece() {
     _soundmovepiece();
     setState(() {
-      while(!checkCollision(Direction.down)) {
+      while (!checkCollision(Direction.down)) {
         currentPiece.movePiece(Direction.down);
       }
     });
@@ -393,11 +395,9 @@ class _GameBoardState extends State<GameBoard> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Colors.transparent),
+                    border: Border.all(color: Colors.transparent),
                   ),
-                  padding: const EdgeInsets.all(
-                      10),
+                  padding: const EdgeInsets.all(10),
                   child: const Text(
                     'Volver',
                     style: TextStyle(
@@ -443,22 +443,22 @@ class _GameBoardState extends State<GameBoard> {
             children: [
               Text(
                 'Puntaje:  $currentScore',
-                style:const TextStyle(
-                    fontFamily: 'roundedsqure',
-                    color: Colors.white,
+                style: const TextStyle(
+                  fontFamily: 'roundedsqure',
+                  color: Colors.white,
                 ),
               ),
               Text(
                 'Dificultad:  $difficulty',
-                style:const TextStyle(
-                    fontFamily: 'roundedsqure',
-                    color: Colors.white,
+                style: const TextStyle(
+                  fontFamily: 'roundedsqure',
+                  color: Colors.white,
                 ),
               ),
               IconButton(
                   onPressed: dropPiece,
                   color: Colors.white,
-                  icon:const Icon(Icons.arrow_downward)),
+                  icon: const Icon(Icons.arrow_downward)),
             ],
           ),
 
@@ -472,17 +472,17 @@ class _GameBoardState extends State<GameBoard> {
                 IconButton(
                     onPressed: moveLeft,
                     color: Colors.white,
-                    icon:const Icon(Icons.arrow_back_ios_new)),
+                    icon: const Icon(Icons.arrow_back_ios_new)),
                 // rotar
                 IconButton(
                     onPressed: rotatePiece,
                     color: Colors.white,
-                    icon:const Icon(Icons.rotate_right)),
+                    icon: const Icon(Icons.rotate_right)),
                 //derecha
                 IconButton(
                     onPressed: moveRight,
                     color: Colors.white,
-                    icon:const Icon(Icons.arrow_forward_ios)),
+                    icon: const Icon(Icons.arrow_forward_ios)),
               ],
             ),
           )
