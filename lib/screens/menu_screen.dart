@@ -9,9 +9,9 @@ class MenuScreen extends StatelessWidget {
         
         title: const Text('Tetris',
          style: TextStyle(
-            fontFamily: 'roundedsqure', // Reemplaza 'TuFuentePixelArt' con la fuente pixel art que desees
-            fontSize: 40, // Ajusta el tamaño de la fuente según tus necesidades
-            color: Colors.white, // Ajusta el color del texto según tus necesidades
+            fontFamily: 'roundedsqure',
+            fontSize: 40,
+            color: Colors.white,
           ),
          
           ),
@@ -32,7 +32,6 @@ class MenuScreen extends StatelessWidget {
           const SizedBox(height: 40),
           InkWell(
       onTap: () {
-        // Navegar a la pantalla del juego
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => GameBoard()),
@@ -40,15 +39,15 @@ class MenuScreen extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.transparent), // Hacer el botón transparente
+          border: Border.all(color: Colors.transparent),
         ),
-        padding: const EdgeInsets.all(10), // Ajusta el espaciado según tus necesidades
+        padding: const EdgeInsets.all(10),
         child: const Text(
           'Iniciar Juego',
           style: TextStyle(
-            fontFamily: 'roundedsqure', // Reemplaza 'TuFuentePixelArt' con la fuente pixel art que desees
-            fontSize: 25, // Ajusta el tamaño de la fuente según tus necesidades
-            color: Colors.white, // Ajusta el color del texto según tus necesidades
+            fontFamily: 'roundedsqure',
+            fontSize: 25,
+            color: Colors.white,
           ),
         ),
       ),

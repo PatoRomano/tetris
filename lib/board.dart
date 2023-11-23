@@ -49,7 +49,7 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   Future<void> _soundmovepiece() async {
-    Soundpool pool = Soundpool(streamType: StreamType.notification);
+    Soundpool pool = Soundpool(streamType: StreamType.music);
 
     int soundId = await rootBundle
         .load("assets/sounds/Tetris-block-move-sound-effect.mp3")
@@ -88,24 +88,16 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void increaseDifficulty() {
-    if (currentScore < 100) {
+    if (currentScore <= 100) {
       frameRate = const Duration(milliseconds: 500);
+      difficulty = 'Fácil';
     } else if (currentScore > 200 && currentScore <= 300) {
       frameRate = const Duration(milliseconds: 300);
-    }else{
-      frameRate = const Duration(milliseconds: 100);
-    }
-    checkDifficulty();
-  }
-
-  void checkDifficulty() {
-    if (frameRate >= const Duration(milliseconds: 500)) {
-      difficulty = 'Fácil';
-    } else if (frameRate == const Duration(milliseconds: 300)) {
       _audioPlayer.setSpeed(1.2);
       difficulty = 'Media';
-    } else if (frameRate < const Duration(milliseconds: 100)) {
-      _audioPlayer.setSpeed(1.5);
+    } else if (currentScore > 300){
+      frameRate = const Duration(milliseconds: 100);
+      _audioPlayer.setSpeed(1.3);
       difficulty = 'Difícil';
     }
   }
