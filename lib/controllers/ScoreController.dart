@@ -25,7 +25,10 @@ class ScoreManager {
       final contents = await file.readAsString();
       final parsed = jsonDecode(contents) as List<dynamic>;
 
-      return parsed.map((scoreJson) => Score.fromJson(scoreJson)).toList();
+      List<Score> scores = parsed.map((scoreJson) => Score.fromJson(scoreJson)).toList();
+      scores.sort((a, b) => b.score.compareTo(a.score));
+      return scores;
+
     } catch (e) {
       print('error al leer el codigo: $e');
       return [];
