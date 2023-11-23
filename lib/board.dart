@@ -78,8 +78,10 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   Future<void> updateScores() async {
+    late List<Score> scoresList = [];
     final scores = await scoreManager.readScores();
-    scores.add(Score(playerName: nombre, score: currentScore));
+    scoresList = scores;
+    scores.add(Score(id:scoresList.length + 1,playerName: nombre, score: currentScore));
     await scoreManager.writeScores(scores);
   }
 
@@ -245,7 +247,7 @@ class _GameBoardState extends State<GameBoard> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.grey[900],
-          title: Text(
+          title: const Text(
             'Ingresa tu nombre',
             style: TextStyle(
               fontSize: 18,
@@ -253,11 +255,11 @@ class _GameBoardState extends State<GameBoard> {
               fontFamily: 'roundedsqure',
             ),
           ),
-          content: Column(
+          content: SingleChildScrollView(child:Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
                 onChanged: (value) {
                   setState(() {
                     nombre = value;
@@ -266,15 +268,15 @@ class _GameBoardState extends State<GameBoard> {
                 decoration: InputDecoration(
                   hintText: 'Nombre',
                   hintStyle: TextStyle(color: Colors.grey[600]),
-                  enabledBorder: OutlineInputBorder(
+                  enabledBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white),
                   ),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white),
                   ),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: nombre.isNotEmpty
                     ? () {
@@ -288,7 +290,7 @@ class _GameBoardState extends State<GameBoard> {
               ),
             ],
           ),
-        );
+        ));
       },
     );
   }

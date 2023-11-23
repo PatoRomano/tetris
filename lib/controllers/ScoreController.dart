@@ -51,11 +51,11 @@ class ScoreManager {
     }
   }
 
-  Future<void> deleteScore(String playerName, int scoreValue) async {
+  Future<void> deleteScore(int id, String playerName, int scoreValue) async {
     try {
       List<Score> scores = await readScores();
       scores.removeWhere((score) =>
-          score.playerName == playerName && score.score == scoreValue);
+          score.playerName == playerName && score.score == scoreValue && score.id == id);
       await writeScores(scores);
     } catch (e) {
       print('Error al eliminar el puntaje: $e');
@@ -66,11 +66,13 @@ class ScoreManager {
 class Score {
   final String playerName;
   final int score;
+  final int id;
 
-  Score({required this.playerName, required this.score});
+  Score({required this.id, required this.playerName, required this.score});
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'playerName': playerName,
       'score': score,
     };
@@ -78,6 +80,7 @@ class Score {
 
   factory Score.fromJson(Map<String, dynamic> json) {
     return Score(
+      id:json['id'],
       playerName: json['playerName'],
       score: json['score'],
     );

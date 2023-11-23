@@ -17,8 +17,15 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
   }
 
   Future<void> loadScores() async {
-    scores = await scoreManager.readScores();
-    setState(() {});
+    var loadedScores = await scoreManager.readScores();
+    setState(() {
+      scores = loadedScores;
+    });
+  }
+
+  Future<void> deleteScoreAndUpdate(Score score) async {
+    await scoreManager.deleteScore(score.id,score.playerName, score.score);
+    loadScores(); // Actualizar la lista
   }
 
   @override
@@ -79,36 +86,57 @@ class _ScoreboardScreenState extends State<ScoreboardScreen> {
                                     color: Colors.white,
                                   ))),
                           trailing: IconButton(
-                            icon: const Icon(Icons.delete,color: Colors.white,),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
                             onPressed: () {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: Text('Eliminar puntaje'),
+                                    backgroundColor: Colors.blueAccent,
+                                    title: const Text('Eliminar puntaje',
+                                     style: TextStyle(
+                                        fontFamily: 'roundedsqure',
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                      ),),
                                     content: const Text(
                                       '¿Estás seguro de querer eliminar este puntaje?',
                                       style: TextStyle(
                                         fontFamily: 'roundedsqure',
-                                        fontSize: 25,
+                                        fontSize: 15,
                                         color: Colors.white,
                                       ),
                                     ),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
-                                          scoreManager.deleteScore(
-                                              score.playerName, score.score);
-                                          loadScores();
                                           Navigator.of(context).pop();
                                         },
-                                        child: const Text('Eliminar'),
+                                        child: const Text(
+                                          'Cancelar',
+                                          style: TextStyle(
+                                            fontFamily: 'roundedsqure',
+                                            fontSize: 15,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                       TextButton(
-                                        onPressed: () {
+                                        onPressed: () async {
+                                          deleteScoreAndUpdate(score);
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text('Cancelar'),
+                                        child: const Text(
+                                          'Eliminar',
+                                          style: TextStyle(
+                                            fontFamily: 'roundedsqure',
+                                            fontSize: 15,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   );
