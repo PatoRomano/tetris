@@ -402,6 +402,7 @@ class _GameBoardState extends State<GameBoard> {
                     'Volver',
                     style: TextStyle(
                       fontFamily: 'roundedsqure',
+                      fontSize: 16,
                       color: Colors.white,
                     ),
                   ),
