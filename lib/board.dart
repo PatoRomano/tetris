@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:soundpool/soundpool.dart';
+import 'package:tetris/controllers/ScoreController.dart';
 import 'package:tetris/piece.dart';
 import 'package:tetris/pixel.dart';
 import 'package:tetris/screens/menu_screen.dart';
@@ -42,6 +43,7 @@ class _GameBoardState extends State<GameBoard> {
   late final AudioPlayer _pop = AudioPlayer();
   late final AudioPlayer _pick = AudioPlayer();
   late Timer gameTimer;
+  final scoreManager = ScoreManager();
   @override
   void initState() {
     super.initState();
@@ -74,6 +76,14 @@ class _GameBoardState extends State<GameBoard> {
     int streamId = await pool.play(soundId);
   }
 
+  Future<void> updateScores() async {
+    final scores = await scoreManager.readScores();
+    // Realiza las actualizaciones necesarias en tu lista de puntuaciones
+    scores.add(Score(playerName: 'Player', score: currentScore));
+    // Guarda la lista actualizada
+    await scoreManager.writeScores(scores);
+  }
+
   void startGame() {
     _audioPlayer.setSpeed(1);
     frameRate = const Duration(milliseconds: 500);
@@ -89,23 +99,23 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void gameLoop() {
-      gameTimer = Timer.periodic(frameRate, (timer) {
-        setState(() {
-          increaseDifficulty();
-          clearLines();
-          checkLanding();
-          if (gameOver || pause) {
-            if(gameOver && !pause) {
-              _gameOver.play();
-              _audioPlayer.seek(Duration.zero, index: 2);
-            }
-            _audioPlayer.stop();
-            showGameOverDialog();
-          } else {
-            currentPiece.movePiece(Direction.down);
+    gameTimer = Timer.periodic(frameRate, (timer) {
+      setState(() {
+        increaseDifficulty();
+        clearLines();
+        checkLanding();
+        if (gameOver || pause) {
+          if (gameOver && !pause) {
+            _gameOver.play();
+            _audioPlayer.seek(Duration.zero, index: 2);
           }
-        });
+          _audioPlayer.stop();
+          showGameOverDialog();
+        } else {
+          currentPiece.movePiece(Direction.down);
+        }
       });
+    });
   }
 
   void increaseDifficulty() {
@@ -125,15 +135,25 @@ class _GameBoardState extends State<GameBoard> {
     //gameLoop();
   }
 
-  void showGameOverDialog() {
+  void showGameOverDialog() async {
+    await updateScores();
     gameTimer.cancel();
     if (gameOver && !volver && !pause) {
+      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.grey[900],
-          title: const Text('Game Over', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
-          content: Text('Tu puntaje alcanzado es:  $currentScore', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
+          title: const Text(
+            'Game Over',
+            style: TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+          ),
+          content: Text(
+            'Tu puntaje alcanzado es:  $currentScore',
+            style: const TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+          ),
           actions: [
             TextButton(
                 onPressed: () {
@@ -143,35 +163,59 @@ class _GameBoardState extends State<GameBoard> {
                   _gameOver.seek(Duration.zero, index: 2);
                   Navigator.pop(context);
                 },
-                child:const Text('Jugar de nuevo', style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),)),
+                child: const Text(
+                  'Jugar de nuevo',
+                  style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+                )),
           ],
         ),
       );
     } else if (volver) {
+      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.grey[900],
-          title: const Text('Game Over', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
-          content: Text('Tu puntaje alcanzado es:  $currentScore', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
+          title: const Text(
+            'Game Over',
+            style: TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+          ),
+          content: Text(
+            'Tu puntaje alcanzado es:  $currentScore',
+            style: const TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+          ),
           actions: [
             TextButton(
                 onPressed: () {
                   // restart
                   Navigator.pop(context);
                 },
-                child:const Text('Ok', style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),)),
+                child: const Text(
+                  'Ok',
+                  style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+                )),
           ],
         ),
       );
       endGame();
     } else if (pause) {
+      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.grey[900],
-          title: const Text('Pausa', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
-          content: Text('Tu puntaje alcanzado es:  $currentScore', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
+          title: const Text(
+            'Pausa',
+            style: TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+          ),
+          content: Text(
+            'Tu puntaje alcanzado es:  $currentScore',
+            style: const TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+          ),
           actions: [
             TextButton(
                 onPressed: () {
@@ -179,7 +223,10 @@ class _GameBoardState extends State<GameBoard> {
                   continueGame();
                   Navigator.pop(context);
                 },
-                child:const Text('Reanudar', style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),)),
+                child: const Text(
+                  'Reanudar',
+                  style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+                )),
           ],
         ),
       );
@@ -197,7 +244,7 @@ class _GameBoardState extends State<GameBoard> {
     );
 
     gameOver = false;
-    if(!volver) {
+    if (!volver) {
       createNewPiece();
 
       startGame();
@@ -214,9 +261,9 @@ class _GameBoardState extends State<GameBoard> {
     //limpiar el tablero
     gameBoard = List.generate(
       colLenght,
-          (i) => List.generate(
+      (i) => List.generate(
         rowLenght,
-            (j) => null,
+        (j) => null,
       ),
     );
     gameOver = false;
@@ -307,7 +354,7 @@ class _GameBoardState extends State<GameBoard> {
   void dropPiece() {
     _soundmovepiece();
     setState(() {
-      while(!checkCollision(Direction.down)) {
+      while (!checkCollision(Direction.down)) {
         currentPiece.movePiece(Direction.down);
       }
     });
@@ -415,11 +462,9 @@ class _GameBoardState extends State<GameBoard> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Colors.transparent),
+                    border: Border.all(color: Colors.transparent),
                   ),
-                  padding: const EdgeInsets.all(
-                      10),
+                  padding: const EdgeInsets.all(10),
                   child: const Text(
                     'Volver',
                     style: TextStyle(
@@ -465,24 +510,24 @@ class _GameBoardState extends State<GameBoard> {
             children: [
               Text(
                 'Puntaje:  $currentScore',
-                style:const TextStyle(
-                    fontFamily: 'roundedsqure',
-                    fontSize: 18,
-                    color: Colors.white,
+                style: const TextStyle(
+                  fontFamily: 'roundedsqure',
+                  fontSize: 18,
+                  color: Colors.white,
                 ),
               ),
               Text(
                 'Dificultad:  $difficulty',
-                style:const TextStyle(
-                    fontFamily: 'roundedsqure',
-                    fontSize: 18,
-                    color: Colors.white,
+                style: const TextStyle(
+                  fontFamily: 'roundedsqure',
+                  fontSize: 18,
+                  color: Colors.white,
                 ),
               ),
               IconButton(
                   onPressed: dropPiece,
                   color: Colors.white,
-                  icon:const Icon(Icons.arrow_downward)),
+                  icon: const Icon(Icons.arrow_downward)),
             ],
           ),
 
@@ -496,17 +541,17 @@ class _GameBoardState extends State<GameBoard> {
                 IconButton(
                     onPressed: moveLeft,
                     color: Colors.white,
-                    icon:const Icon(Icons.arrow_back_ios_new)),
+                    icon: const Icon(Icons.arrow_back_ios_new)),
                 // rotar
                 IconButton(
                     onPressed: rotatePiece,
                     color: Colors.white,
-                    icon:const Icon(Icons.rotate_right)),
+                    icon: const Icon(Icons.rotate_right)),
                 //derecha
                 IconButton(
                     onPressed: moveRight,
                     color: Colors.white,
-                    icon:const Icon(Icons.arrow_forward_ios)),
+                    icon: const Icon(Icons.arrow_forward_ios)),
               ],
             ),
           )

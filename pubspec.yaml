@@ -41,6 +41,8 @@ dependencies:
   just_audio_background: ^0.0.1-beta.10
   flutter_launcher_icons: ^0.13.1
   provider: ^6.1.1
+  path_provider: ^2.0.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
