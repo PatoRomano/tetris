@@ -64,6 +64,8 @@ class _GameBoardState extends State<GameBoard> {
   void startGame() {
     currentScore = 0;
     volver = false;
+    gameOver = false;
+    pause = false;
 
     currentPiece.initializePiece();
     _audioPlayer.play();
@@ -72,20 +74,23 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void gameLoop() {
-    gameTimer = Timer.periodic(frameRate, (timer) {
-      setState(() {
-        increaseDifficulty();
-        clearLines();
-        checkLanding();
-        if (gameOver) {
-          _gameOver.play();
-          _audioPlayer.seek(Duration.zero, index: 2);
-          _audioPlayer.stop();
-          showGameOverDialog();
-        }
-        currentPiece.movePiece(Direction.down);
+      gameTimer = Timer.periodic(frameRate, (timer) {
+        setState(() {
+          increaseDifficulty();
+          clearLines();
+          checkLanding();
+          if (gameOver || pause) {
+            if(gameOver && !pause) {
+              _gameOver.play();
+              _audioPlayer.seek(Duration.zero, index: 2);
+            }
+            _audioPlayer.stop();
+            showGameOverDialog();
+          } else {
+            currentPiece.movePiece(Direction.down);
+          }
+        });
       });
-    });
   }
 
   void increaseDifficulty() {
@@ -101,13 +106,13 @@ class _GameBoardState extends State<GameBoard> {
       _audioPlayer.setSpeed(1.3);
       difficulty = 'Difícil';
     }
-    gameTimer.cancel(); // Cancelar el temporizador existente si hay alguno
-    gameLoop();
+    //gameTimer.cancel();
+    //gameLoop();
   }
 
   void showGameOverDialog() {
     gameTimer.cancel();
-    if (!volver) {
+    if (gameOver && !volver && !pause) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -124,7 +129,7 @@ class _GameBoardState extends State<GameBoard> {
           ],
         ),
       );
-    } else {
+    } else if (volver) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -141,6 +146,23 @@ class _GameBoardState extends State<GameBoard> {
         ),
       );
       endGame();
+    } else if (pause) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Pausa'),
+          content: Text('Tu puntaje alcanzado es:  $currentScore'),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  // restart
+                  continueGame();
+                  Navigator.pop(context);
+                },
+                child:const Text('Reanudar')),
+          ],
+        ),
+      );
     }
   }
 
@@ -160,6 +182,12 @@ class _GameBoardState extends State<GameBoard> {
 
       startGame();
     }
+  }
+
+  void continueGame() {
+    pause = false;
+    _audioPlayer.play();
+    gameLoop();
   }
 
   void endGame() {
