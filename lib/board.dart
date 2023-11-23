@@ -32,6 +32,8 @@ class _GameBoardState extends State<GameBoard> {
 
   bool gameOver = false;
   bool volver = false;
+  bool pause = false;
+
   Duration frameRate = const Duration(milliseconds: 500);
 
   String difficulty = 'Fácil';
@@ -60,7 +62,6 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void startGame() {
-    frameRate = const Duration(milliseconds: 500);
     currentScore = 0;
     volver = false;
 
@@ -80,7 +81,6 @@ class _GameBoardState extends State<GameBoard> {
           _gameOver.play();
           _audioPlayer.seek(Duration.zero, index: 2);
           _audioPlayer.stop();
-          timer.cancel();
           showGameOverDialog();
         }
         currentPiece.movePiece(Direction.down);
@@ -106,6 +106,7 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void showGameOverDialog() {
+    gameTimer.cancel();
     if (!volver) {
       showDialog(
         context: context,
@@ -139,7 +140,7 @@ class _GameBoardState extends State<GameBoard> {
           ],
         ),
       );
-      resetGame();
+      endGame();
     }
   }
 
@@ -170,6 +171,9 @@ class _GameBoardState extends State<GameBoard> {
             (j) => null,
       ),
     );
+    gameOver = false;
+    volver = false;
+    pause = false;
   }
 
   bool checkCollision(Direction direction) {
@@ -313,6 +317,23 @@ class _GameBoardState extends State<GameBoard> {
                 },
                 child: const Text(
                   'Reiniciar',
+                  style: TextStyle(
+                    fontFamily: 'roundedsqure',
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20, bottom: 10.0),
+              child: TextButton(
+                onPressed: () {
+                  // restart
+                  pause = true;
+                },
+                child: const Text(
+                  'Pausa',
                   style: TextStyle(
                     fontFamily: 'roundedsqure',
                     fontSize: 16,
