@@ -32,7 +32,7 @@ class _GameBoardState extends State<GameBoard> {
 
   bool gameOver = false;
   bool volver = false;
-  Duration frameRate = const Duration(milliseconds: 500);
+  Duration frameRate = const Duration(milliseconds: 400);
 
   String difficulty = 'Fácil';
   late final AudioPlayer _audioPlayer = AudioPlayer();
@@ -60,7 +60,7 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   void startGame() {
-    frameRate = const Duration(milliseconds: 500);
+    frameRate = const Duration(milliseconds: 400);
     currentScore = 0;
     volver = false;
 
@@ -92,12 +92,12 @@ class _GameBoardState extends State<GameBoard> {
     if (currentScore <= 100) {
       frameRate = const Duration(milliseconds: 500);
       difficulty = 'Fácil';
-    } else if (currentScore > 200 && currentScore <= 300) {
+    } else if (currentScore == 300) {
       frameRate = const Duration(milliseconds: 300);
       _audioPlayer.setSpeed(1.2);
       difficulty = 'Media';
-    } else if (currentScore > 300) {
-      frameRate = const Duration(milliseconds: 100);
+    } else if (currentScore >= 300) {
+      frameRate = const Duration(milliseconds: 250);
       _audioPlayer.setSpeed(1.3);
       difficulty = 'Difícil';
     }
