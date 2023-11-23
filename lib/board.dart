@@ -39,13 +39,15 @@ class _GameBoardState extends State<GameBoard> {
   String difficulty = 'Fácil';
   late final AudioPlayer _audioPlayer = AudioPlayer();
   late final AudioPlayer _gameOver = AudioPlayer();
+  late final AudioPlayer _pop = AudioPlayer();
   late final AudioPlayer _pick = AudioPlayer();
   late Timer gameTimer;
   @override
   void initState() {
     super.initState();
     _audioPlayer.setAsset('assets/sounds/musica.mp3');
-    _gameOver.setAsset('assets/sounds/sad-trumpet.mp3');
+    _gameOver.setAsset('assets/sounds/sad-violin.mp3');
+    _pop.setAsset('assets/sounds/pop.mp3');
     _pick.setAsset('assets/sounds/pick.mp3');
     startGame();
   }
@@ -61,38 +63,49 @@ class _GameBoardState extends State<GameBoard> {
     int streamId = await pool.play(soundId);
   }
 
+  Future<void> _soundClearLines() async {
+    Soundpool pool = Soundpool(streamType: StreamType.music);
+
+    int soundId = await rootBundle
+        .load("assets/sounds/pop.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+    int streamId = await pool.play(soundId);
+  }
+
   void startGame() {
+    _audioPlayer.setSpeed(1);
+    frameRate = const Duration(milliseconds: 500);
     currentScore = 0;
     volver = false;
     gameOver = false;
     pause = false;
 
     currentPiece.initializePiece();
-    _audioPlayer.setSpeed(1.0);
     _audioPlayer.play();
-    frameRate = const Duration(milliseconds: 500);
 
     gameLoop();
   }
 
   void gameLoop() {
-    gameTimer = Timer.periodic(frameRate, (timer) {
-      setState(() {
-        increaseDifficulty();
-        clearLines();
-        checkLanding();
-        if (gameOver || pause) {
-          if (gameOver && !pause) {
-            _gameOver.play();
-            _audioPlayer.seek(Duration.zero, index: 2);
+      gameTimer = Timer.periodic(frameRate, (timer) {
+        setState(() {
+          increaseDifficulty();
+          clearLines();
+          checkLanding();
+          if (gameOver || pause) {
+            if(gameOver && !pause) {
+              _gameOver.play();
+              _audioPlayer.seek(Duration.zero, index: 2);
+            }
+            _audioPlayer.stop();
+            showGameOverDialog();
+          } else {
+            currentPiece.movePiece(Direction.down);
           }
-          _audioPlayer.stop();
-          showGameOverDialog();
-        } else {
-          currentPiece.movePiece(Direction.down);
-        }
+        });
       });
-    });
   }
 
   void increaseDifficulty() {
@@ -118,16 +131,19 @@ class _GameBoardState extends State<GameBoard> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Game Over'),
-          content: Text('Tu puntaje alcanzado es:  $currentScore'),
+          backgroundColor: Colors.grey[900],
+          title: const Text('Game Over', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
+          content: Text('Tu puntaje alcanzado es:  $currentScore', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
           actions: [
             TextButton(
                 onPressed: () {
                   // restart
                   resetGame();
+                  _gameOver.stop();
+                  _gameOver.seek(Duration.zero, index: 2);
                   Navigator.pop(context);
                 },
-                child: const Text('Jugar de nuevo')),
+                child:const Text('Jugar de nuevo', style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),)),
           ],
         ),
       );
@@ -135,15 +151,16 @@ class _GameBoardState extends State<GameBoard> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Game Over'),
-          content: Text('Tu puntaje alcanzado es:  $currentScore'),
+          backgroundColor: Colors.grey[900],
+          title: const Text('Game Over', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
+          content: Text('Tu puntaje alcanzado es:  $currentScore', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
           actions: [
             TextButton(
                 onPressed: () {
                   // restart
                   Navigator.pop(context);
                 },
-                child: const Text('Ok')),
+                child:const Text('Ok', style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),)),
           ],
         ),
       );
@@ -152,8 +169,9 @@ class _GameBoardState extends State<GameBoard> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Pausa'),
-          content: Text('Tu puntaje alcanzado es:  $currentScore'),
+          backgroundColor: Colors.grey[900],
+          title: const Text('Pausa', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
+          content: Text('Tu puntaje alcanzado es:  $currentScore', style: TextStyle(fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),),
           actions: [
             TextButton(
                 onPressed: () {
@@ -161,7 +179,7 @@ class _GameBoardState extends State<GameBoard> {
                   continueGame();
                   Navigator.pop(context);
                 },
-                child: const Text('Reanudar')),
+                child:const Text('Reanudar', style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),)),
           ],
         ),
       );
@@ -179,7 +197,7 @@ class _GameBoardState extends State<GameBoard> {
     );
 
     gameOver = false;
-    if (!volver) {
+    if(!volver) {
       createNewPiece();
 
       startGame();
@@ -196,9 +214,9 @@ class _GameBoardState extends State<GameBoard> {
     //limpiar el tablero
     gameBoard = List.generate(
       colLenght,
-      (i) => List.generate(
+          (i) => List.generate(
         rowLenght,
-        (j) => null,
+            (j) => null,
       ),
     );
     gameOver = false;
@@ -289,7 +307,7 @@ class _GameBoardState extends State<GameBoard> {
   void dropPiece() {
     _soundmovepiece();
     setState(() {
-      while (!checkCollision(Direction.down)) {
+      while(!checkCollision(Direction.down)) {
         currentPiece.movePiece(Direction.down);
       }
     });
@@ -314,6 +332,7 @@ class _GameBoardState extends State<GameBoard> {
 
       // si esta llena, eliminar la fila y bajar las piezas una fila
       if (rowIsFull) {
+        _soundClearLines();
         // mover todas las filas hhacia abajo
         for (int r = row; r > 0; r--) {
           // copia la fila superior, a la fila actual, es decir, digamos, osea, copia tal cual esta a la de abajo.
@@ -325,7 +344,8 @@ class _GameBoardState extends State<GameBoard> {
 
         // incrementar el puntaje.
         currentScore += 100;
-        _pick.play();
+        //_pick.play();
+        //_pop.stop();
       }
     }
   }
@@ -358,7 +378,7 @@ class _GameBoardState extends State<GameBoard> {
                   'Reiniciar',
                   style: TextStyle(
                     fontFamily: 'roundedsqure',
-                    fontSize: 16,
+                    fontSize: 18,
                     color: Colors.white,
                   ),
                 ),
@@ -375,7 +395,7 @@ class _GameBoardState extends State<GameBoard> {
                   'Pausa',
                   style: TextStyle(
                     fontFamily: 'roundedsqure',
-                    fontSize: 16,
+                    fontSize: 18,
                     color: Colors.white,
                   ),
                 ),
@@ -395,14 +415,16 @@ class _GameBoardState extends State<GameBoard> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.transparent),
+                    border: Border.all(
+                        color: Colors.transparent),
                   ),
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(
+                      10),
                   child: const Text(
                     'Volver',
                     style: TextStyle(
                       fontFamily: 'roundedsqure',
-                      fontSize: 16,
+                      fontSize: 18,
                       color: Colors.white,
                     ),
                   ),
@@ -443,22 +465,24 @@ class _GameBoardState extends State<GameBoard> {
             children: [
               Text(
                 'Puntaje:  $currentScore',
-                style: const TextStyle(
-                  fontFamily: 'roundedsqure',
-                  color: Colors.white,
+                style:const TextStyle(
+                    fontFamily: 'roundedsqure',
+                    fontSize: 18,
+                    color: Colors.white,
                 ),
               ),
               Text(
                 'Dificultad:  $difficulty',
-                style: const TextStyle(
-                  fontFamily: 'roundedsqure',
-                  color: Colors.white,
+                style:const TextStyle(
+                    fontFamily: 'roundedsqure',
+                    fontSize: 18,
+                    color: Colors.white,
                 ),
               ),
               IconButton(
                   onPressed: dropPiece,
                   color: Colors.white,
-                  icon: const Icon(Icons.arrow_downward)),
+                  icon:const Icon(Icons.arrow_downward)),
             ],
           ),
 
@@ -472,17 +496,17 @@ class _GameBoardState extends State<GameBoard> {
                 IconButton(
                     onPressed: moveLeft,
                     color: Colors.white,
-                    icon: const Icon(Icons.arrow_back_ios_new)),
+                    icon:const Icon(Icons.arrow_back_ios_new)),
                 // rotar
                 IconButton(
                     onPressed: rotatePiece,
                     color: Colors.white,
-                    icon: const Icon(Icons.rotate_right)),
+                    icon:const Icon(Icons.rotate_right)),
                 //derecha
                 IconButton(
                     onPressed: moveRight,
                     color: Colors.white,
-                    icon: const Icon(Icons.arrow_forward_ios)),
+                    icon:const Icon(Icons.arrow_forward_ios)),
               ],
             ),
           )

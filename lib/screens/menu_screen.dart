@@ -18,6 +18,7 @@ class MenuScreen extends StatelessWidget {
          centerTitle: true,
          toolbarHeight: 100,
         backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
