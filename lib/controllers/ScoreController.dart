@@ -25,10 +25,10 @@ class ScoreManager {
       final contents = await file.readAsString();
       final parsed = jsonDecode(contents) as List<dynamic>;
 
-      List<Score> scores = parsed.map((scoreJson) => Score.fromJson(scoreJson)).toList();
+      List<Score> scores =
+          parsed.map((scoreJson) => Score.fromJson(scoreJson)).toList();
       scores.sort((a, b) => b.score.compareTo(a.score));
       return scores;
-
     } catch (e) {
       print('error al leer el codigo: $e');
       return [];
@@ -43,10 +43,22 @@ class ScoreManager {
   Future<void> writeScores(List<Score> scores) async {
     try {
       final file = File(_filePath);
-      final jsonString = jsonEncode(scores.map((score) => score.toJson()).toList());
+      final jsonString =
+          jsonEncode(scores.map((score) => score.toJson()).toList());
       await file.writeAsString(jsonString);
     } catch (e) {
       print('error al escribir el codigo: $e');
+    }
+  }
+
+  Future<void> deleteScore(String playerName, int scoreValue) async {
+    try {
+      List<Score> scores = await readScores();
+      scores.removeWhere((score) =>
+          score.playerName == playerName && score.score == scoreValue);
+      await writeScores(scores);
+    } catch (e) {
+      print('Error al eliminar el puntaje: $e');
     }
   }
 }
