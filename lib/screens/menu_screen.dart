@@ -6,70 +6,78 @@ class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Tetris',
-          style: TextStyle(
-            fontFamily: 'roundedsqure',
-            fontSize: 40,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
-        toolbarHeight: 100,
-        backgroundColor: Colors.black,
-        automaticallyImplyLeading: false,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          const FadeInImage(
-              placeholder: AssetImage(
-                'assets/images/espacio.jpg',
-              ),
-              image: AssetImage(
-                'assets/images/espacio.jpg',
-              )),
-          const SizedBox(height: 40),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => GameBoard()),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.transparent),
-              ),
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                'Iniciar Juego',
-                style: TextStyle(
-                  fontFamily: 'roundedsqure',
-                  fontSize: 25,
-                  color: Colors.white,
+          Image.asset(
+            'assets/images/galaxy.jpg',
+            fit: BoxFit.cover,
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => GameBoard()),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[900],
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white),
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  child: const Text(
+                    'Iniciar Juego',
+                    style: TextStyle(
+                      fontFamily: 'roundedsqure',
+                      fontSize: 36,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ScoreboardScreen()),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.transparent),
+              SizedBox(height: 20), // Otro espacio entre los botones
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ScoreboardScreen()),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[900],
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white),
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  child: const Text(
+                    'Puntuaciones',
+                    style: TextStyle(
+                      fontFamily: 'roundedsqure',
+                      fontSize: 36,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
-              padding: const EdgeInsets.all(10),
-              child: const Text(
-                'Tabla de Puntuaciones',
+            ],
+          ),
+          Positioned(
+            top: 50,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Text(
+                'Tetris',
                 style: TextStyle(
                   fontFamily: 'roundedsqure',
-                  fontSize: 25,
+                  fontSize: 72,
                   color: Colors.white,
                 ),
               ),
