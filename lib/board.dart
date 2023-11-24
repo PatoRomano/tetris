@@ -149,7 +149,7 @@ class _GameBoardState extends State<GameBoard> {
     }*/
     if (gameOver && !volver && !pause) {
       // ignore: use_build_context_synchronously
-      if (currentScore != 0 && gameOver && volver) {
+      if (currentScore != 0) {
         await _preguntarNombre();
         await updateScores();
       }
@@ -186,34 +186,38 @@ class _GameBoardState extends State<GameBoard> {
       );
     } else if (volver) {
       // ignore: use_build_context_synchronously
-      //showDialog(
-      /*barrierDismissible: false,
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title: const Text(
-            'Game Over',
-            style: TextStyle(
-                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+      if (currentScore != 0) {
+        await _preguntarNombre();
+        await updateScores();
+      }
+      showDialog(
+        barrierDismissible: false,
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.grey[900],
+            title: const Text(
+              'Game Over',
+              style: TextStyle(
+                  fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+            ),
+            content: Text(
+              'Tu puntaje alcanzado es:  $currentScore',
+              style: const TextStyle(
+                  fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    // restart
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    'Ok',
+                    style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+                  )),
+            ],
           ),
-          content: Text(
-            'Tu puntaje alcanzado es:  $currentScore',
-            style: const TextStyle(
-                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
-          ),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  // restart
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Ok',
-                  style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
-                )),
-          ],
-        ),
-      );*/
+        );
       endGame();
     } else if (pause) {
       // ignore: use_build_context_synchronously
