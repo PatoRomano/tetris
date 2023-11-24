@@ -100,7 +100,6 @@ class _GameBoardState extends State<GameBoard> {
 
     currentPiece.initializePiece();
     _audioPlayer.play();
-
     gameLoop();
   }
 
@@ -128,16 +127,16 @@ class _GameBoardState extends State<GameBoard> {
     if (currentScore <= 100) {
       frameRate = const Duration(milliseconds: 500);
       difficulty = 'Fácil';
-    } else if (currentScore == 300) {
+    } else if (currentScore >= 300 && currentScore < 600) {
       frameRate = const Duration(milliseconds: 400);
       _audioPlayer.setSpeed(1.2);
       difficulty = 'Media';
-    } else if (currentScore >= 300 && currentScore < 1000) {
+    } else if (currentScore >= 600 && currentScore < 1000) {
       frameRate = const Duration(milliseconds: 300);
       _audioPlayer.setSpeed(1.3);
       difficulty = 'Difícil';
     } else if (currentScore >= 1000) {
-      frameRate = const Duration(milliseconds: 175);
+      frameRate = const Duration(milliseconds: 200);
       _audioPlayer.setSpeed(1.5);
       difficulty = 'Extremo';
     }
@@ -189,10 +188,17 @@ class _GameBoardState extends State<GameBoard> {
                   'Jugar de nuevo',
                   style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
                 )),
-                 TextButton(
+            TextButton(
                 onPressed: () {
                   volver = true;
                   gameOver = true;
+                  gameBoard = List.generate(
+                    colLenght,
+                    (i) => List.generate(
+                      rowLenght,
+                      (j) => null,
+                    ),
+                  );
                   // Navegar a la pantalla del juego
                   Navigator.pop(context);
                   Navigator.pushReplacement(
