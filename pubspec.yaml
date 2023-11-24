@@ -80,6 +80,7 @@ flutter:
     - assets/sounds/sad-violin.mp3
     - assets/sounds/pop.mp3
     - assets/sounds/minecraft_click.mp3
+    - assets/sounds/menuMusic.mp3
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

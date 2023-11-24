@@ -217,7 +217,9 @@ class _GameBoardState extends State<GameBoard> {
       // ignore: use_build_context_synchronously
       if (currentScore != 0) {
         await _preguntarNombre();
-        await updateScores();
+         if (guardarResultado == 1) {
+          await updateScores();
+        }
       }
       // ignore: use_build_context_synchronously
       showDialog(
