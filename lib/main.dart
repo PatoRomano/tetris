@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:tetris/controllers/MusicController.dart';
 import 'package:tetris/screens/menu_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
-  runApp(const MyApp());
+   runApp(
+    ChangeNotifierProvider(
+      create: (context) => MusicPlayerController(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
