@@ -31,6 +31,7 @@ class _GameBoardState extends State<GameBoard> {
 
   int currentScore = 0;
 
+  int guardarResultado = 0;
   bool gameOver = false;
   bool volver = false;
   bool pause = false;
@@ -131,13 +132,17 @@ class _GameBoardState extends State<GameBoard> {
       frameRate = const Duration(milliseconds: 400);
       _audioPlayer.setSpeed(1.2);
       difficulty = 'Media';
-    } else if (currentScore >= 300) {
+    } else if (currentScore >= 300 && currentScore < 1000) {
       frameRate = const Duration(milliseconds: 300);
       _audioPlayer.setSpeed(1.3);
       difficulty = 'Difícil';
+    } else if (currentScore >= 1000) {
+      frameRate = const Duration(milliseconds: 175);
+      _audioPlayer.setSpeed(1.5);
+      difficulty = 'Extremo';
     }
-    //gameTimer.cancel();
-    //gameLoop();
+    gameTimer.cancel();
+    gameLoop();
   }
 
   void showGameOverDialog() async {
@@ -151,8 +156,11 @@ class _GameBoardState extends State<GameBoard> {
       // ignore: use_build_context_synchronously
       if (currentScore != 0) {
         await _preguntarNombre();
-        await updateScores();
+        if (guardarResultado == 1) {
+          await updateScores();
+        }
       }
+      // ignore: use_build_context_synchronously
       showDialog(
         barrierDismissible: false,
         context: context,
@@ -181,6 +189,21 @@ class _GameBoardState extends State<GameBoard> {
                   'Jugar de nuevo',
                   style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
                 )),
+                 TextButton(
+                onPressed: () {
+                  volver = true;
+                  gameOver = true;
+                  // Navegar a la pantalla del juego
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => MenuScreen()),
+                  );
+                },
+                child: const Text(
+                  'Ir al menú',
+                  style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+                ))
           ],
         ),
       );
@@ -190,34 +213,35 @@ class _GameBoardState extends State<GameBoard> {
         await _preguntarNombre();
         await updateScores();
       }
+      // ignore: use_build_context_synchronously
       showDialog(
         barrierDismissible: false,
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: Colors.grey[900],
-            title: const Text(
-              'Game Over',
-              style: TextStyle(
-                  fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
-            ),
-            content: Text(
-              'Tu puntaje alcanzado es:  $currentScore',
-              style: const TextStyle(
-                  fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    // restart
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    'Ok',
-                    style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
-                  )),
-            ],
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text(
+            'Game Over',
+            style: TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
           ),
-        );
+          content: Text(
+            'Tu puntaje alcanzado es:  $currentScore',
+            style: const TextStyle(
+                fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  // restart
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Ok',
+                  style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+                )),
+          ],
+        ),
+      );
       endGame();
     } else if (pause) {
       // ignore: use_build_context_synchronously
@@ -291,8 +315,21 @@ class _GameBoardState extends State<GameBoard> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Cierra el cuadro de diálogo
+                    },
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'roundedsqure',
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
                     onPressed: nombre.isNotEmpty
                         ? () {
+                            guardarResultado = 1;
                             Navigator.pop(
                                 context); // Cierra el cuadro de diálogo
                           }
