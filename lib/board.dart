@@ -217,7 +217,7 @@ class _GameBoardState extends State<GameBoard> {
       // ignore: use_build_context_synchronously
       if (currentScore != 0) {
         await _preguntarNombre();
-         if (guardarResultado == 1) {
+        if (guardarResultado == 1) {
           await updateScores();
         }
       }
@@ -288,6 +288,7 @@ class _GameBoardState extends State<GameBoard> {
   Future<void> _preguntarNombre() async {
     return showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
             backgroundColor: Colors.grey[900],
@@ -322,31 +323,36 @@ class _GameBoardState extends State<GameBoard> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Cierra el cuadro de diálogo
-                    },
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'roundedsqure',
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Cierra el cuadro de diálogo
+                        },
+                        child: const Text(
+                          'Cancelar',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'roundedsqure',
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: nombre.isNotEmpty
-                        ? () {
-                            guardarResultado = 1;
-                            Navigator.pop(
-                                context); // Cierra el cuadro de diálogo
-                          }
-                        : null,
-                    child: const Text(
-                      'Aceptar',
-                      style:
-                          TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
-                    ),
+                      ElevatedButton(
+                        onPressed: nombre.isNotEmpty
+                            ? () {
+                                guardarResultado = 1;
+                                Navigator.pop(
+                                    context); // Cierra el cuadro de diálogo
+                              }
+                            : null,
+                        child: const Text(
+                          'Aceptar',
+                          style: TextStyle(
+                              fontSize: 18, fontFamily: 'roundedsqure'),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
