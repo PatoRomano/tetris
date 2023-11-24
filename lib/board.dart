@@ -99,6 +99,7 @@ class _GameBoardState extends State<GameBoard> {
     pause = false;
 
     currentPiece.initializePiece();
+    _audioPlayer.setLoopMode(LoopMode.one);
     _audioPlayer.play();
     gameLoop();
   }
