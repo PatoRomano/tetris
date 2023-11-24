@@ -81,7 +81,8 @@ class _GameBoardState extends State<GameBoard> {
     late List<Score> scoresList = [];
     final scores = await scoreManager.readScores();
     scoresList = scores;
-    scores.add(Score(id:scoresList.length + 1,playerName: nombre, score: currentScore));
+    scores.add(Score(
+        id: scoresList.length + 1, playerName: nombre, score: currentScore));
     await scoreManager.writeScores(scores);
   }
 
@@ -142,12 +143,16 @@ class _GameBoardState extends State<GameBoard> {
   void showGameOverDialog() async {
     nombre = "Player";
     gameTimer.cancel();
-    if (currentScore != 0) {
+    /*if (currentScore != 0 && gameOver && volver) {
       await _preguntarNombre();
       await updateScores();
-    }
+    }*/
     if (gameOver && !volver && !pause) {
       // ignore: use_build_context_synchronously
+      if (currentScore != 0 && gameOver && volver) {
+        await _preguntarNombre();
+        await updateScores();
+      }
       showDialog(
         barrierDismissible: false,
         context: context,
@@ -181,8 +186,8 @@ class _GameBoardState extends State<GameBoard> {
       );
     } else if (volver) {
       // ignore: use_build_context_synchronously
-      showDialog(
-        barrierDismissible: false,
+      //showDialog(
+      /*barrierDismissible: false,
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: Colors.grey[900],
@@ -208,7 +213,7 @@ class _GameBoardState extends State<GameBoard> {
                 )),
           ],
         ),
-      );
+      );*/
       endGame();
     } else if (pause) {
       // ignore: use_build_context_synchronously
@@ -223,7 +228,7 @@ class _GameBoardState extends State<GameBoard> {
                 fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
           ),
           content: Text(
-            'Tu puntaje alcanzado es:  $currentScore',
+            'Tu puntaje actual es:  $currentScore',
             style: const TextStyle(
                 fontSize: 18, color: Colors.white, fontFamily: 'roundedsqure'),
           ),
@@ -249,51 +254,54 @@ class _GameBoardState extends State<GameBoard> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title: const Text(
-            'Ingresa tu nombre',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-              fontFamily: 'roundedsqure',
+            backgroundColor: Colors.grey[900],
+            title: const Text(
+              'Ingresa tu nombre',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontFamily: 'roundedsqure',
+              ),
             ),
-          ),
-          content: SingleChildScrollView(child:Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                style: const TextStyle(color: Colors.white),
-                onChanged: (value) {
-                  setState(() {
-                    nombre = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Nombre',
-                  hintStyle: TextStyle(color: Colors.grey[600]),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    style: const TextStyle(color: Colors.white),
+                    onChanged: (value) {
+                      setState(() {
+                        nombre = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Nombre',
+                      hintStyle: TextStyle(color: Colors.grey[600]),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                    ),
                   ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: nombre.isNotEmpty
+                        ? () {
+                            Navigator.pop(
+                                context); // Cierra el cuadro de diálogo
+                          }
+                        : null,
+                    child: const Text(
+                      'Aceptar',
+                      style:
+                          TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
+                    ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: nombre.isNotEmpty
-                    ? () {
-                        Navigator.pop(context); // Cierra el cuadro de diálogo
-                      }
-                    : null,
-                child: const Text(
-                  'Aceptar',
-                  style: TextStyle(fontSize: 18, fontFamily: 'roundedsqure'),
-                ),
-              ),
-            ],
-          ),
-        ));
+            ));
       },
     );
   }
